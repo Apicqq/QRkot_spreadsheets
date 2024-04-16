@@ -37,14 +37,14 @@ class CRUDCharityProject(
                 [
                     CharityProject.name,
                     (
-                        func.DATE(CharityProject.close_date) -
-                        func.DATE(CharityProject.create_date)
-                    ).label("rate"),
+                        func.JULIANDAY(CharityProject.close_date) -
+                        func.JULIANDAY(CharityProject.create_date)
+                    ).label("comp_rate"),
                     CharityProject.description,
                 ]
             )
             .where(CharityProject.fully_invested.is_(True))
-            .order_by("rate")
+            .order_by("comp_rate")
         )
         return projects.all()
 
