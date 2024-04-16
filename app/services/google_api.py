@@ -106,11 +106,10 @@ async def spreadsheet_update_value(
             HTTPStatus.BAD_REQUEST,
             Econst.PROJECTS_LIMIT_REACHED
         )
-    _range = f"R1C1:R{len(update_body.get('values'))}C3"
     await wrapper_service.as_service_account(
         service.spreadsheets.values.update(
             spreadsheetId=spreadsheet_id,
-            range=_range,
+            range=f"R1C1:R{len(update_body.get('values'))}C3",
             valueInputOption="USER_ENTERED",
             json=update_body
         )
