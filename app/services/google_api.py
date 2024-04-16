@@ -1,32 +1,64 @@
 from datetime import datetime, timedelta
+from http import HTTPStatus
 
 from aiogoogle import Aiogoogle
+from fastapi import HTTPException
 
 from app.core.config import settings
-from app.core.constants import ConfigConstants
+from app.core.constants import (ErrConstants as Econst,
+                                UtilityConstants as Uconst)
+
+SPREADSHEET_DT_FORMAT = "%Y/%m/%d %H:%M:%S"
 
 
-async def create_spreadsheet(wrapper_service: Aiogoogle) -> str:
-    service = await wrapper_service.discover(
-        "sheets", settings.google_sheets_api_version
+def get_spreadsheet_header(_datetime: str) -> list:
+    return [
+        ["Отчёт от", _datetime],
+        ["Топ проектов по скорости закрытия"],
+        ["Название проекта", "Время сбора", "Описание"]
+    ]
+
+
+def get_spreadsheet_body(
+        _datetime: str,
+        rows: int,
+        columns: int = 3
+) -> dict:
+    return dict(
+        properties=dict(
+            title=f"Charity projects report from {_datetime}",
+            locale="ru_RU",
+        ),
+        sheets=[dict(properties=dict(
+            sheetType="GRID",
+            sheetId=0,
+            title="Лист1",
+            gridProperties=dict(
+                rowCount=rows,
+                columnCount=columns
+            )
+        ))]
     )
-    spreadsheet_body = {
-        "properties": {
-            "title": settings.report_title.format(
-                datetime.now().strftime(settings.spreadsheet_dt_format)
-            )},
-        "sheets": [{"properties": {"sheetType": "GRID",
-                                   "sheetId": 0,
-                                   "title": "Лист1",
-                                   "gridProperties": {"rowCount": 100,
-                                                      "columnCount": 11}
-                                   }}]
 
-    }
+
+async def create_spreadsheet(
+        wrapper_service: Aiogoogle,
+        rows: int
+) -> dict:
+    service = await wrapper_service.discover(
+        "sheets", "v4"
+    )
+    spreadsheet_body = get_spreadsheet_body(
+        datetime.now().strftime(SPREADSHEET_DT_FORMAT),
+        rows
+    )
     response = await wrapper_service.as_service_account(
         service.spreadsheets.create(json=spreadsheet_body)
     )
-    return response['spreadsheetId']
+    return dict(
+        id=response["spreadsheetId"],
+        url=response["spreadsheetUrl"]
+    )
 
 
 async def set_user_permissions(
@@ -39,7 +71,7 @@ async def set_user_permissions(
         "emailAddress": settings.email
     }
     service = await wrapper_service.discover(
-        "drive", settings.google_drive_api_version
+        "drive", "v3"
     )
     await wrapper_service.as_service_account(
         service.permissions.create(
@@ -56,27 +88,29 @@ async def spreadsheet_update_value(
         charity_projects: list
 ) -> None:
     service = await wrapper_service.discover(
-        "sheets", settings.google_sheets_api_version
+        "sheets", "v4"
     )
     table_values = [
-        ["Отчёт от", datetime.now().strftime(
-            ConfigConstants.SPREADSHEET_DT_FORMAT
-        )],
-        ["Топ проектов по скорости закрытия"],
-        ["Название проекта", "Время сбора", "Описание"]
+        *get_spreadsheet_header(
+            datetime.now().strftime(SPREADSHEET_DT_FORMAT)),
+        *[list(
+            map(str, [project[0], timedelta(days=project[1]), project[2]])
+        ) for project in charity_projects]
     ]
-    for project in charity_projects:
-        row = list(project)
-        row[1] = str(timedelta(days=project[1]))
-        table_values.append(row)
     update_body = {
         "values": table_values,
         "majorDimension": "ROWS"
     }
+    if len(update_body.get("values")) >= Uconst.GOOGLE_SPREADSHEET_ROWS_LIMIT:
+        raise HTTPException(
+            HTTPStatus.BAD_REQUEST,
+            Econst.PROJECTS_LIMIT_REACHED
+        )
+    _range = f"R1C1:R{len(update_body.get('values'))}C3"
     await wrapper_service.as_service_account(
         service.spreadsheets.values.update(
             spreadsheetId=spreadsheet_id,
-            range=settings.spreadsheet_range,
+            range=_range,
             valueInputOption="USER_ENTERED",
             json=update_body
         )

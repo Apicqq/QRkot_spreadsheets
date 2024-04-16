@@ -1,9 +1,12 @@
 from aiogoogle import Aiogoogle
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config import settings
 from app.core.db import get_async_session
+from app.core.constants import (
+    ErrConstants as Econst,
+    UtilityConstants as Uconst
+)
 from app.core.google_client import get_service
 from app.core.user import current_superuser
 from app.crud.charity_project import charity_crud
@@ -27,13 +30,20 @@ async def get_charity_projects_report(
     Superusers only.
     """
     projects = await charity_crud.get_projects_by_completion_rate(session)
-    spreadsheet_id = await create_spreadsheet(wrapper_service)
-    await set_user_permissions(spreadsheet_id, wrapper_service)
-    await spreadsheet_update_value(
-        spreadsheet_id,
+    spreadsheet = await create_spreadsheet(
         wrapper_service,
-        projects
+        len(projects) + Uconst.HEADER_ROWS_COUNT
     )
+    spreadsheet_id, spreadsheet_url = spreadsheet["id"], spreadsheet["url"]
+    await set_user_permissions(spreadsheet_id, wrapper_service)
+    try:
+        await spreadsheet_update_value(
+            spreadsheet_id,
+            wrapper_service,
+            projects
+        )
+    except HTTPException:
+        return {"error": Econst.PROJECTS_LIMIT_REACHED}
     return {
-        "Your report at": f"{settings.google_sheets_base_uri}/{spreadsheet_id}"
+        "Your report at": f"{spreadsheet_url}"
     }

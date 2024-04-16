@@ -15,6 +15,9 @@ class ErrConstants(str, Enum):
     )
     PASSWORD_TOO_SHORT = "Password should be at least 3 characters"
     EMAIL_IN_PASSWORD = "Password should not contain e-mail"
+    PROJECTS_LIMIT_REACHED = ("Your query exceeded technical limit of a google"
+                              " spreadsheet limit, therefore query cannot be "
+                              "processed. Please contact administrators.")
 
 
 class DBConstants(Enum):
@@ -32,15 +35,13 @@ class ConfigConstants(str, Enum):
     DESCRIPTION = "API for the Charity application QRKot cat support fund."
     DATABASE_URL = "sqlite+aiosqlite:///./CatCharityFund.db"
     SECRET = "VeryDamnSecretSecret"
-    SPREADSHEET_DT_FORMAT = "%Y/%m/%d %H:%M:%S"
-    SPREADSHEET_RANGE = "A1:E30"
-    SPREADSHEET_REPORT_NAME = "Charity projects report from {}"
-    GOOGLE_DRIVE_API_VERSION = "v3"
-    GOOGLE_SHEETS_API_VERSION = "v4"
-    GOOGLE_SHEETS_BASE_URI = "https://docs.google.com/spreadsheets/d/"
 
 
 class SchemaConstants(IntEnum):
-
     CHARITY_PROJ_FIELD_MIN_LENGTH = 1
     CHARITY_PROJ_FIELD_MAX_LENGTH = 100
+
+
+class UtilityConstants(IntEnum):
+    GOOGLE_SPREADSHEET_ROWS_LIMIT = 1_000_000_000
+    HEADER_ROWS_COUNT = 13  # 3 for the header and extra 10 for visual clarity
