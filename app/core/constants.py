@@ -32,6 +32,12 @@ class ConfigConstants(str, Enum):
     DESCRIPTION = "API for the Charity application QRKot cat support fund."
     DATABASE_URL = "sqlite+aiosqlite:///./CatCharityFund.db"
     SECRET = "VeryDamnSecretSecret"
+    SPREADSHEET_DT_FORMAT = "%Y/%m/%d %H:%M:%S"
+    SPREADSHEET_RANGE = "A1:E30"
+    SPREADSHEET_REPORT_NAME = "Charity projects report from {}"
+    GOOGLE_DRIVE_API_VERSION = "v3"
+    GOOGLE_SHEETS_API_VERSION = "v4"
+    GOOGLE_SHEETS_BASE_URI = "https://docs.google.com/spreadsheets/d/"
 
 
 class SchemaConstants(IntEnum):

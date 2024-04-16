@@ -23,6 +23,12 @@ class Settings(BaseSettings):
     auth_provider_x509_cert_url: Optional[str] = None
     client_x509_cert_url: Optional[str] = None
     email: Optional[str] = None
+    spreadsheet_dt_format: str = ConfigConst.SPREADSHEET_DT_FORMAT
+    spreadsheet_range: str = ConfigConst.SPREADSHEET_RANGE
+    report_title: str = ConfigConst.SPREADSHEET_REPORT_NAME
+    google_drive_api_version: str = ConfigConst.GOOGLE_DRIVE_API_VERSION
+    google_sheets_api_version: str = ConfigConst.GOOGLE_SHEETS_API_VERSION
+    google_sheets_base_uri: str = ConfigConst.GOOGLE_SHEETS_BASE_URI
 
     class Config:
         env_file = ".env"
