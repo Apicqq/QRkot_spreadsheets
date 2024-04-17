@@ -1,11 +1,13 @@
+from http import HTTPStatus
+
 from aiogoogle import Aiogoogle
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session
-from app.core.constants import (
-    ErrConstants as Econst,
-    UtilityConstants as Uconst
+from app.core.constants import ErrConstants as Econst
+from app.core.exceptions import (
+    MaxColumnsLimitExceeded, MaxRowsLimitExceeded
 )
 from app.core.google_client import get_service
 from app.core.user import current_superuser
@@ -30,20 +32,22 @@ async def get_charity_projects_report(
     Superusers only.
     """
     projects = await charity_crud.get_projects_by_completion_rate(session)
-    spreadsheet = await create_spreadsheet(
-        wrapper_service,
-        len(projects) + Uconst.HEADER_ROWS_COUNT
-    )
-    spreadsheet_id, spreadsheet_url = spreadsheet["id"], spreadsheet["url"]
-    await set_user_permissions(spreadsheet_id, wrapper_service)
     try:
-        await spreadsheet_update_value(
-            spreadsheet_id,
+        spreadsheet_id, spreadsheet_url = await create_spreadsheet(
             wrapper_service,
             projects
         )
-    except HTTPException:
-        return {"error": Econst.PROJECTS_LIMIT_REACHED}
+    except (MaxRowsLimitExceeded, MaxColumnsLimitExceeded) as error:
+        raise HTTPException(
+            HTTPStatus.BAD_REQUEST,
+            Econst.PROJECTS_LIMIT_REACHED.format(error)
+        )
+    await set_user_permissions(spreadsheet_id, wrapper_service)
+    await spreadsheet_update_value(
+        spreadsheet_id,
+        wrapper_service,
+        projects
+    )
     return {
         "Your report at": f"{spreadsheet_url}"
     }
