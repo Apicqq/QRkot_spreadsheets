@@ -51,7 +51,10 @@ async def create_spreadsheet(
     grid_properties = spreadsheet_body["sheets"][0]["properties"][
         "gridProperties"
     ]
-    if grid_properties["rowCount"] >= Uconst.GOOGLE_SPREADSHEET_ROWS_LIMIT:
+    if (
+            grid_properties["rowCount"] >=
+            Uconst.GOOGLE_SPREADSHEET_ROWS_LIMIT
+    ):
         raise MaxRowsLimitExceeded(
             Errconst.EXCEEDED_ROWS_AMOUNT.format(
                 grid_properties["rowCount"],
