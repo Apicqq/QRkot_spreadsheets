@@ -1,27 +1,6 @@
 from enum import Enum, IntEnum
 
 
-class ErrConstants(str, Enum):
-    NAME_IS_BUSY = "This name is already occupied"
-    NOT_FOUND = "Not Found"
-    CANNOT_MODIFY_CLOSED_PROJECT = (
-        "You cannot modify a project that was closed"
-    )
-    CANNOT_DELETE_PROJECT_WITH_INVESTMENTS = (
-        "You cannot delete a project that has some investments"
-    )
-    FULL_AMOUNT_LT_INVESTED_AMOUNT = (
-        "You cannot set full amount that is less" "than invested amount"
-    )
-    PASSWORD_TOO_SHORT = "Password should be at least 3 characters"
-    EMAIL_IN_PASSWORD = "Password should not contain e-mail"
-    PROJECTS_LIMIT_REACHED = (
-        "Your query exceeded technical limit: {} of a "
-        "google spreadsheet, therefore it cannot be "
-        "processed. Please contact administrators."
-    )
-
-
 class DBConstants(Enum):
     INVESTED_AMOUNT_DEFAULT = 0
     CHARITY_PROJECT_NAME_DEFAULT = 100
@@ -45,6 +24,32 @@ class SchemaConstants(IntEnum):
 
 
 class UtilityConstants(IntEnum):
-    GOOGLE_SPREADSHEET_ROWS_LIMIT = 1_000_000_000
-    GOOGLE_SPREADSHEET_COLUMNS_LIMIT = 18_278
-    HEADER_ROWS_COUNT = 13  # 3 for the header and extra 10 for visual clarity
+    GOOGLE_SPREADSHEET_ROWS_LIMIT = 1000000000
+    GOOGLE_SPREADSHEET_COLUMNS_LIMIT = 18278
+
+
+class ErrConstants(str, Enum):
+    NAME_IS_BUSY = "This name is already occupied"
+    NOT_FOUND = "Not Found"
+    CANNOT_MODIFY_CLOSED_PROJECT = (
+        "You cannot modify a project that was closed"
+    )
+    CANNOT_DELETE_PROJECT_WITH_INVESTMENTS = (
+        "You cannot delete a project that has some investments"
+    )
+    FULL_AMOUNT_LT_INVESTED_AMOUNT = (
+        "You cannot set full amount that is less" "than invested amount"
+    )
+    PASSWORD_TOO_SHORT = "Password should be at least 3 characters"
+    EMAIL_IN_PASSWORD = "Password should not contain e-mail"
+    PROJECTS_LIMIT_REACHED = (
+        "Your query exceeded technical limit: {} of a "
+        "google spreadsheet, therefore it cannot be "
+        "processed. Please contact administrators."
+    )
+    EXCEEDED_ROWS_AMOUNT = (
+        "rows {}/"f"{UtilityConstants.GOOGLE_SPREADSHEET_ROWS_LIMIT}"
+    )
+    EXCEEDED_COLUMNS_AMOUNT = (
+        "columns {}/"f"{UtilityConstants.GOOGLE_SPREADSHEET_COLUMNS_LIMIT}"
+    )
