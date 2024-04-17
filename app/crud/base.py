@@ -41,8 +41,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         if user is not None:
             obj_in_data["user_id"] = user.id
         db_obj = self.model(**obj_in_data)
-        if (hasattr(db_obj, "invested_amount") and
-                db_obj.invested_amount is None):
+        if (
+            hasattr(db_obj, "invested_amount") and
+                db_obj.invested_amount is None
+        ):
             db_obj.invested_amount = 0
         session.add(db_obj)
         if not skip_commit:

@@ -15,9 +15,11 @@ class ErrConstants(str, Enum):
     )
     PASSWORD_TOO_SHORT = "Password should be at least 3 characters"
     EMAIL_IN_PASSWORD = "Password should not contain e-mail"
-    PROJECTS_LIMIT_REACHED = ("Your query exceeded technical limit: {} of a "
-                              "google spreadsheet, therefore it cannot be "
-                              "processed. Please contact administrators.")
+    PROJECTS_LIMIT_REACHED = (
+        "Your query exceeded technical limit: {} of a "
+        "google spreadsheet, therefore it cannot be "
+        "processed. Please contact administrators."
+    )
 
 
 class DBConstants(Enum):

@@ -25,11 +25,13 @@ class Investment(Base):
         ),
         CheckConstraint(
             "invested_amount >= 0", name=Db.INVESTED_AMOUNT_GE_ZERO.value
-        )
+        ),
     )
 
     def __repr__(self):
-        return (f"{type(self).__name__} #{self.id}: "
-                f"Current investment amount is: {self.invested_amount}"
-                f"/{self.full_amount}. Created at: {self.create_date}, "
-                f"closed at: {self.close_date}")
+        return (
+            f"{type(self).__name__} #{self.id}: "
+            f"Current investment amount is: {self.invested_amount}"
+            f"/{self.full_amount}. Created at: {self.create_date}, "
+            f"closed at: {self.close_date}"
+        )
