@@ -15,8 +15,8 @@ class ErrConstants(str, Enum):
     )
     PASSWORD_TOO_SHORT = "Password should be at least 3 characters"
     EMAIL_IN_PASSWORD = "Password should not contain e-mail"
-    PROJECTS_LIMIT_REACHED = ("Your query exceeded technical limit of a google"
-                              " spreadsheet limit, therefore query cannot be "
+    PROJECTS_LIMIT_REACHED = ("Your query exceeded technical limit: {} of a "
+                              "google spreadsheet, therefore it cannot be "
                               "processed. Please contact administrators.")
 
 
@@ -44,4 +44,5 @@ class SchemaConstants(IntEnum):
 
 class UtilityConstants(IntEnum):
     GOOGLE_SPREADSHEET_ROWS_LIMIT = 1_000_000_000
+    GOOGLE_SPREADSHEET_COLUMNS_LIMIT = 18_278
     HEADER_ROWS_COUNT = 13  # 3 for the header and extra 10 for visual clarity
